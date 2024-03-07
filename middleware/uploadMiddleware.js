@@ -19,12 +19,12 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage: storage,
   fileFilter: function (req, file, callback) {
-    const allowedMimes = ["image/png", "image/jpg", "image/jpeg", "image/svg+xml"];
+    const allowedMimes = ["image/png", "image/jpg", "image/jpeg"];
 
     if (allowedMimes.includes(file.mimetype)) {
       callback(null, true);
     } else {
-      console.log("Only jpg, png, jpeg, & svg files are supported");
+      console.log("Only jpg, png, jpeg files are supported");
       callback(null, false);
     }
   },
