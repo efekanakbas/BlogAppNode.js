@@ -8,7 +8,7 @@ require("dotenv").config();
 
 // Mongo DB Connections
 mongoose
-  .connect(process.env.MONGO_DB_URL)
+  .connect(process.env.MONGODB_URI)
   .then(() => {
     console.log("MongoDB Connection Succeeded.");
   })
