@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-const authModel = require("./auth");
 
 function limitArray(limit){
     return function(value){
@@ -65,6 +64,22 @@ const feedModel = new Schema({
                 }
             ],
             default: []
+        },
+        hashtags: {
+            type: Array,
+            default: []
+        },
+        mentions: {
+            type: Array,
+            default: []
+        },
+        location: {
+            type: String,
+            default: null
+        },
+        createAt: {
+            type: Date,
+            default: Date.now
         }
     }
 });

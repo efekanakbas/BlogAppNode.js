@@ -7,9 +7,13 @@ const feedGET = async (req, res) => {
       const limit = parseInt(req.query.limit) || 10;
   
       const startIndex = (page - 1) * limit;
-    
-      // Sayfalama işlemi yapar
-      const allFeeds = await feedModel.find().skip(startIndex).limit(limit).lean();
+  
+      // Sayfalama işlemi yapar ve createAt alanına göre sıralar
+      const allFeeds = await feedModel.find()
+        .skip(startIndex)
+        .limit(limit)
+        .sort({ "feed.createAt": -1 }) // -1 büyükten küçüğe sıralar
+        .lean();
   
       // __v ve _id alanlarını çıkarır ve istenen formata dönüştürür
       const formattedFeeds = allFeeds.map((feed) => {
@@ -32,20 +36,23 @@ const feedGET = async (req, res) => {
     }
   };
   
+
+  
   
 
   const feedPOST = async (req, res) => {
     try {
-      const { text, liked, likeCount, commentsCount, comments } = req.body;
-      const images = req.files.map(file => file.path);
+      const { text, liked, likeCount, commentsCount, comments, createAt, hashtags, mentions, location } = req.body;
+
+      const images = req.files && req.files.map(file => file.path);
       const userId = req.user.userId;
+
   
       const me = await authModel.findById(userId, { password: 0, __v: 0 }).lean();
       // _id alanını userId olarak yeniden adlandırır
       me.userId = me._id;
       delete me._id;
   
-      console.log("images", images);
       const feed = {
         text: text,
         images: images,
@@ -53,6 +60,10 @@ const feedGET = async (req, res) => {
         likeCount: likeCount,
         commentsCount: commentsCount,
         comments: comments,
+        hashtags: hashtags,
+        mentions: mentions,
+        location: location,
+        createAt: createAt
       };
   
       const newFeed = (await feedModel.create({ user: me, feed })).toObject();
