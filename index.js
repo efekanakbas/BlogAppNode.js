@@ -26,7 +26,9 @@ app.use(express.json());
 // app.use('/', routerFeed)
 // app.use('/', routerAuth)
 app.get('/', (req, res) => {
-    res.send('HELLO WORLD!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+    res.json({
+        message: "HELLO WORLD!!"
+    })
 })
 
 // Connection
