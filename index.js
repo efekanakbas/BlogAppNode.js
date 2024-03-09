@@ -4,7 +4,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const routerFeed = require("./routes/feed");
 const routerAuth = require("./routes/auth");
-require("dotenv").config();
+// require("dotenv").config();
 
 // Mongo DB Connections
 // mongoose
