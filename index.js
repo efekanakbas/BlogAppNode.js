@@ -37,7 +37,7 @@ app.use('/', routerFeed)
 app.use('/', routerAuth)
 app.get('/', (req, res) => {
     res.json({
-        message: 'Hello World'
+        message: 'Hello World!'
     })
 })
 
