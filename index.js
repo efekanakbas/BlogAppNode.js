@@ -4,7 +4,17 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const routerFeed = require("./routes/feed");
 const routerAuth = require("./routes/auth");
+const https = require('https');
+const fs = require('fs');
 require("dotenv").config();
+
+// License options
+
+const options = {
+    key: fs.readFileSync('localhost.key'),
+    cert: fs.readFileSync('localhost.crt'),
+  };
+  const server = https.createServer(options, app);
 
 // Mongo DB Connections
 mongoose
@@ -25,9 +35,14 @@ app.use('/uploads', express.static('uploads'))
 // Routes
 app.use('/', routerFeed)
 app.use('/', routerAuth)
+app.get('/', (req, res) => {
+    res.json({
+        message: 'Hello World'
+    })
+})
 
 // Connection
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log("App running in port: " + PORT);
 });
