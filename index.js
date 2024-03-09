@@ -1,12 +1,36 @@
-const express = require('express')
-
+const express = require("express");
 const app = express();
-app.use(express.json())
+// const cors = require("cors");
+// const mongoose = require("mongoose");
+// const routerFeed = require("./routes/feed");
+// const routerAuth = require("./routes/auth");
+// require("dotenv").config();
 
-app.get('/', (req,res) => {
-    res.send('Hello Wordld!!!!!!')
+// Mongo DB Connections
+// mongoose
+//   .connect(process.env.MONGODB_URI)
+//   .then(() => {
+//     console.log("MongoDB Connection Succeeded.");
+//   })
+//   .catch((error) => {
+//     console.log("Error in DB connection: " + error);
+//   });
+
+// Middleware Connections
+// app.use(cors());
+app.use(express.json());
+// app.use(express.urlencoded({ limit: "30mb", extended: true }));
+// app.use('/uploads', express.static('uploads'))
+
+// Routes
+// app.use('/', routerFeed)
+// app.use('/', routerAuth)
+app.get('/', (req, res) => {
+    res.send('HELLO WORLD!!!!!!!!!!!!!!!!!!!!!!!!!!!')
 })
 
-app.listen(process.env.PORT || 5000, () => {
-    console.log("server")
-})
+// Connection
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log("App running in port: " + PORT);
+});
