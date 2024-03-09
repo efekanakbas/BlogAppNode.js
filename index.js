@@ -7,24 +7,24 @@ const routerAuth = require("./routes/auth");
 require("dotenv").config();
 
 // Mongo DB Connections
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log("MongoDB Connection Succeeded.");
-  })
-  .catch((error) => {
-    console.log("Error in DB connection: " + error);
-  });
+// mongoose
+//   .connect(process.env.MONGODB_URI)
+//   .then(() => {
+//     console.log("MongoDB Connection Succeeded.");
+//   })
+//   .catch((error) => {
+//     console.log("Error in DB connection: " + error);
+//   });
 
 // Middleware Connections
-app.use(cors());
+// app.use(cors());
 app.use(express.json({ limit: "30mb", extended: true }));
-app.use(express.urlencoded({ limit: "30mb", extended: true }));
-app.use('/uploads', express.static('uploads'))
+// app.use(express.urlencoded({ limit: "30mb", extended: true }));
+// app.use('/uploads', express.static('uploads'))
 
 // Routes
-app.use('/', routerFeed)
-app.use('/', routerAuth)
+// app.use('/', routerFeed)
+// app.use('/', routerAuth)
 app.get('/', (req, res) => {
     res.json({
         message: 'Hello World'
