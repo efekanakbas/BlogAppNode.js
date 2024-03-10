@@ -8,7 +8,7 @@ require("dotenv").config();
 
 // Mongo DB Connections
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect("mongodb+srv://efekanakbas98:Efekan28.@mycluster.oh0qius.mongodb.net/blogApp?retryWrites=true&w=majority&appName=myCluster")
   .then(() => {
     console.log("MongoDB Connection Succeeded.");
   })
