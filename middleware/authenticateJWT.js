@@ -17,7 +17,7 @@ const authenticateJWT = (req, res, next) => {
   }
 
   // Verify the token
-  jwt.verify(token, "sjdfsjdfisldfjsogjhdorausosjsfd", (err, user) => {
+  jwt.verify(token, process.env.SECRET_TOKEN, (err, user) => {
     if (err) {
       console.error("JWT Verification Error:", err);
       return res.status(403).json({ message: "Forbidden - Invalid token"});

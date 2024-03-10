@@ -46,7 +46,7 @@ const registerPOST = async (req, res) => {
       {
         userId: newUser._id,
       },
-      "sjdfsjdfisldfjsogjhdorausosjsfd",
+      process.env.SECRET_TOKEN,
       { expiresIn: "1h" }
     );
 
@@ -86,7 +86,7 @@ const loginPOST = async (req, res) => {
       {
         userId: user._id,
       },
-      "sjdfsjdfisldfjsogjhdorausosjsfd",
+      process.env.SECRET_TOKEN,
       { expiresIn: "7d" }
     );
 
