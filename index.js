@@ -1,20 +1,20 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-// const mongoose = require("mongoose");
+const mongoose = require("mongoose");
 // const routerFeed = require("./routes/feed");
 // const routerAuth = require("./routes/auth");
 require("dotenv").config();
 
 // Mongo DB Connections
-// mongoose
-//   .connect(process.env.MONGODB_URI)
-//   .then(() => {
-//     console.log("MongoDB Connection Succeeded.");
-//   })
-//   .catch((error) => {
-//     console.log("Error in DB connection: " + error);
-//   });
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => {
+    console.log("MongoDB Connection Succeeded.");
+  })
+  .catch((error) => {
+    console.log("Error in DB connection: " + error);
+  });
 
 // Middleware Connections
 app.use(cors());
