@@ -4,6 +4,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const routerFeed = require("./routes/feed");
 const routerAuth = require("./routes/auth");
+const routerMessage = require("./routes/message");
 require("dotenv").config();
 
 // Mongo DB Connections
@@ -25,6 +26,7 @@ app.use("/uploads", express.static("uploads"));
 // Routes
 app.use("/", routerFeed);
 app.use("/", routerAuth);
+app.use("/", routerMessage)
 app.get("/", (req, res) => {
   res.json({
     message: "HELLO WORLD!!!",

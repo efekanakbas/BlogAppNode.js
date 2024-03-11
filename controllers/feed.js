@@ -42,7 +42,7 @@ const feedGET = async (req, res) => {
 
   const feedPOST = async (req, res) => {
     try {
-      const { text, liked, likeCount, commentsCount, comments, createAt, hashtags, mentions, location } = req.body;
+      const { text, liked, likeCount, commentsCount, comments, hashtags, mentions, location } = req.body;
       console.log("BODY", req.body)
       const images = req.body.images; // req.body.images üzerinden resimlerin URL'lerine erişin
       const userId = req.user.userId;
@@ -63,7 +63,6 @@ const feedGET = async (req, res) => {
         hashtags: hashtags,
         mentions: mentions,
         location: location,
-        createAt: createAt
       };
   
       const newFeed = (await feedModel.create({ user: me, feed })).toObject();

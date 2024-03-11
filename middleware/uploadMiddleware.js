@@ -3,16 +3,16 @@ const { v4: uuidv4 } = require('uuid');
 const cloudinary = require('cloudinary').v2;
 const streamifier = require('streamifier');
 
-// Cloudinary konfigürasyonu
+// Cloudinary configurations
 cloudinary.config({
- cloud_name: "djgg4wjct",
- api_key: "419886385413456",
- api_secret: "7F71KL1LXG0P3FGMQZHNmJORvkQ",
+ cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+ api_key: process.env.CLOUDINARY_API_KEY,
+ api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Multer yapılandırması
+// Multer configurations
 const upload = multer({
- storage: multer.memoryStorage(), // Dosyaları bellekte tut
+ storage: multer.memoryStorage(), // Holds files at memory
  fileFilter: function (req, file, callback) {
     const allowedMimes = ["image/png", "image/jpg", "image/jpeg"];
 
@@ -28,7 +28,7 @@ const upload = multer({
  },
 }).any();
 
-// Middleware fonksiyonu
+// Middleware configurations
 const uploadMiddleware = async (req, res, next) => {
  upload(req, res, async function (err) {
      if (err instanceof multer.MulterError) {
@@ -41,9 +41,8 @@ const uploadMiddleware = async (req, res, next) => {
        return res.status(500).json({ message: "Unknown error" });
      }
 
-     // Dosyaları Cloudinary'ye yükle
+     // Uploads files on cloudinary
      const urls = [];
-     console.log("reqFİLES", req.files)
      if (req.files) {
       for (const file of req.files) {
         try {
@@ -65,7 +64,7 @@ const uploadMiddleware = async (req, res, next) => {
       }
     }
 
-     req.body.images = urls; // Yüklenen resimlerin URL'lerini req.body.images'e ekleyin
+     req.body.images = urls; // Adds uploaded files to request's body
      next();
  });
 };

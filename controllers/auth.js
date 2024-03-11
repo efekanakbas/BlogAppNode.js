@@ -6,8 +6,11 @@ const jwt = require("jsonwebtoken");
 const registerPOST = async (req, res) => {
   const { firstName, lastName, email, username, password, confirm } = req.body;
   const user = await authModel.findOne({
-    $or: [{ email }, { username: email }],
-  });
+    $or: [
+       { email: email },
+       { username: username }
+    ]
+   });
   if (!validator.isEmail(email)) {
     res.status(500).json({ message: "invalid email" });
     return;
