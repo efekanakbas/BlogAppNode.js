@@ -5,6 +5,8 @@ const mongoose = require("mongoose");
 const routerFeed = require("./routes/feed");
 const routerAuth = require("./routes/auth");
 const routerMessage = require("./routes/message");
+const http = require('http')
+const { Server } = require('socket.io')
 require("dotenv").config();
 
 // Mongo DB Connections
@@ -16,6 +18,24 @@ mongoose
   .catch((error) => {
     console.log("Error in DB connection: " + error);
   });
+
+// Socket
+const server = http.createServer(app)
+const io = new Server(server, {
+    cors: {
+        origin: '*',
+        methods: ['GET', 'POST']
+    }
+})
+
+io.on('connection', (socket) => {
+  socket.on("room", (data) => {
+    console.log("data", data)
+  })
+
+
+
+});
 
 // Middleware Connections
 app.use(cors());
@@ -35,6 +55,6 @@ app.get("/", (req, res) => {
 
 // Connection
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log("App running in port: " + PORT);
 });
