@@ -1,7 +1,6 @@
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const path = require("path");
 const { v4: uuidv4 } = require('uuid');
 
 // Cloudinary configurations
@@ -15,7 +14,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: "uploads", // Cloudinary'de resimlerin yükleneceği klasör
+    folder: "uploads", // Upload folder at cloudinary
     public_id: (req, file) => `${file.fieldname}-${uuidv4()}`,
   },
 });
