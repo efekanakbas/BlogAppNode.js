@@ -50,7 +50,7 @@ const uploadMiddleware = (req, res, next) => {
           console.error("Cloudinary upload error:", error);
           return res.status(500).json({ message: "Cloudinary upload error" });
         }
-        // Dosya başarıyla yüklendi, sonuçları req.body'ye ekleyin
+        // Dosya başarıyla yüklendi, sonuçları req.body'ye ekleyin!
         req.body[file.fieldname] = result.secure_url;
       }).end(file.buffer);
     });
