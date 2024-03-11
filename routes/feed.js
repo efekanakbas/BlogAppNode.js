@@ -5,6 +5,6 @@ const uploadMiddleware = require("../middleware/uploadMiddleware");
 const authenticateJWT = require('../middleware/authenticateJWT');
 
 router.get('/feeds', authenticateJWT , feedGET)
-router.post('/feeds', authenticateJWT ,  feedPOST)
+router.post('/feeds', authenticateJWT , uploadMiddleware,  feedPOST)
 
 module.exports = router;
