@@ -4,7 +4,6 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const routerFeed = require("./routes/feed");
 const routerAuth = require("./routes/auth");
-const cloudinary = require("cloudinary").v2;
 require("dotenv").config();
 
 // Mongo DB Connections
@@ -16,13 +15,6 @@ mongoose
   .catch((error) => {
     console.log("Error in DB connection: " + error);
   });
-
-  // Cloudinary Configirations
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 
 // Middleware Connections
 app.use(cors());
