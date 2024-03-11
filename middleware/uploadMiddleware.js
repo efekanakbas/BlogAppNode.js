@@ -1,12 +1,13 @@
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
 const cloudinary = require('cloudinary').v2;
+const streamifier = require('streamifier');
 
 // Cloudinary konfigürasyonu
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+ cloud_name: "djgg4wjct",
+ api_key: "419886385413456",
+ api_secret: "7F71KL1LXG0P3FGMQZHNmJORvkQ",
 });
 
 // Multer yapılandırması
@@ -28,36 +29,44 @@ const upload = multer({
 }).any();
 
 // Middleware fonksiyonu
-const uploadMiddleware = (req, res, next) => {
- upload(req, res, function (err) {
-    if (err instanceof multer.MulterError) {
-      if (err.code === "LIMIT_FILE_SIZE") {
-        return res.status(400).json({ message: "File size exceeds the limit (2MB)" });
-      } else {
-        return res.status(500).json({ message: "Multer error" });
-      }
-    } else if (err) {
-      return res.status(500).json({ message: "Unknown error" });
-    }
+const uploadMiddleware = async (req, res, next) => {
+ upload(req, res, async function (err) {
+     if (err instanceof multer.MulterError) {
+       if (err.code === "LIMIT_FILE_SIZE") {
+         return res.status(400).json({ message: "File size exceeds the limit (2MB)" });
+       } else {
+         return res.status(500).json({ message: "Multer error" });
+       }
+     } else if (err) {
+       return res.status(500).json({ message: "Unknown error" });
+     }
 
-    // Dosyaları Cloudinary'ye yükle
-    const promises = req.files.map(file => {
-      return cloudinary.uploader.upload_stream({
-        folder: "uploads",
-        public_id: `${file.fieldname}-${uuidv4()}`,
-      }, (error, result) => {
-        if (error) {
+     // Dosyaları Cloudinary'ye yükle
+     const urls = [];
+     console.log("reqFİLES", req.files)
+     if (req.files) {
+      for (const file of req.files) {
+        try {
+          const result = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream({
+              folder: "uploads",
+              public_id: `${file.fieldname}-${uuidv4()}`,
+            }, (error, result) => {
+              if (error) reject(error);
+              else resolve(result);
+            });
+            streamifier.createReadStream(file.buffer).pipe(uploadStream);
+          });
+          urls.push(result.secure_url);
+        } catch (error) {
           console.error("Cloudinary upload error:", error);
           return res.status(500).json({ message: "Cloudinary upload error" });
         }
-        // Dosya başarıyla yüklendi, sonuçları req.body'ye ekleyin!
-        req.body[file.fieldname] = result.secure_url;
-      }).end(file.buffer);
-    });
+      }
+    }
 
-    Promise.all(promises)
-      .then(() => next())
-      .catch(err => res.status(500).json({ message: "Cloudinary upload error" }));
+     req.body.images = urls; // Yüklenen resimlerin URL'lerini req.body.images'e ekleyin
+     next();
  });
 };
 

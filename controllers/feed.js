@@ -43,8 +43,8 @@ const feedGET = async (req, res) => {
   const feedPOST = async (req, res) => {
     try {
       const { text, liked, likeCount, commentsCount, comments, createAt, hashtags, mentions, location } = req.body;
-
-      const images = req.files && req.files.map(file => file.path);
+      console.log("BODY", req.body)
+      const images = req.body.images; // req.body.images üzerinden resimlerin URL'lerine erişin
       const userId = req.user.userId;
 
   
