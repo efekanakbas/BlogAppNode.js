@@ -25,6 +25,10 @@ const authModel = new mongoose.Schema({
     avatar: {
         type: String,
         default: null
+    },
+    cover: {
+        type: String,
+        default: null
     }
 })
 

@@ -1,18 +1,22 @@
 const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const path = require("path");
 const { v4: uuidv4 } = require('uuid');
 
-// Multer storage
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/");
-  },
-  filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname);
-    const uniqueFilename = uuidv4();
-    const filename = file.fieldname + "-" + uniqueFilename + ext;
+// Cloudinary configurations
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-    cb(null, filename);
+// Storage options for cloudinary
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "uploads", // Cloudinary'de resimlerin yükleneceği klasör
+    public_id: (req, file) => `${file.fieldname}-${uuidv4()}`,
   },
 });
 
