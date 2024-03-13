@@ -1,15 +1,13 @@
 const messageModel = require('../models/message.js')
 const authModel = require("../models/auth.js");
 const { ObjectId } = require('mongodb');
-// const { io } = require('../middleware/socket.js')
-
-
 
 
 const messageGET = async (req, res) => {
     try {
       const userId = req.user.userId;
       const objectId = new ObjectId(userId);
+      
 
       // Tüm mesajları kullanıcı ID'lerine göre gruplandır
       const groupedMessages = await messageModel.aggregate([
@@ -17,7 +15,7 @@ const messageGET = async (req, res) => {
           $match: {
             $or: [
               { "user.userId": objectId },
-              { "message.receiver.userId": objectId }
+              { "message.receiver.userId": userId }
             ]
           }
         },
@@ -148,7 +146,7 @@ const messagePOST = async (req, res) => {
     restWithoutMessage.message = lastMessage;
 
     // Gerçek zamanlı olarak mesajı gönder
-    // io.to(receiverId).emit('messageReturn2', restWithoutMessage);
+    // io.to(receiverId).emit('messageReturn', restWithoutMessage);
 
     res.status(201).json({
       post: restWithoutMessage,

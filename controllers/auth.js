@@ -69,7 +69,9 @@ const loginPOST = async (req, res) => {
     const { email, password } = req.body;
 
     const user = await authModel.findOne({
-      $or: [{ email }, { username: email }],
+      $or: [
+       { email: email },
+    ]
     });
     if (!user) {
       return res.status(500).json({
@@ -84,6 +86,9 @@ const loginPOST = async (req, res) => {
         message: "Password not match.",
       });
     }
+
+    await authModel.findByIdAndUpdate(user._id, { isLogged: true });
+    user.isLogged = true
 
     const token = jwt.sign(
       {
@@ -104,4 +109,48 @@ const loginPOST = async (req, res) => {
   }
 };
 
-module.exports = { registerPOST, loginPOST };
+const isLoggedGET = async (req, res) => {
+  try {
+    const userId = req.user.userId; 
+
+    if (!userId) {
+      return res.status(500).json({
+        message: "User not found.",
+      });
+    }
+
+    const user = await authModel.findById(userId);
+
+    res.status(200).json({
+      status: user.isLogged
+    });
+  } catch (error) {
+    console.error("Error,", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+const logoutGET = async (req, res) => {
+  try {
+    const userId = req.user.userId; 
+
+    if (!userId) {
+      return res.status(500).json({
+        message: "User not found.",
+      });
+    }
+
+    await authModel.findByIdAndUpdate(userId, { isLogged: false });
+
+    res.status(200).json({
+      status: "200",
+      message: "Logout successful.",
+    });
+  } catch (error) {
+    console.error("Error,", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+module.exports = { registerPOST, loginPOST, logoutGET, isLoggedGET };

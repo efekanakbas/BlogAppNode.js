@@ -29,6 +29,10 @@ const authModel = new mongoose.Schema({
     cover: {
         type: String,
         default: null
+    },
+    isLogged: {
+        type: Boolean,
+        default: false
     }
 })
 

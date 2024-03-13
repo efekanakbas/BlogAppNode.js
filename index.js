@@ -6,8 +6,7 @@ const routerFeed = require("./routes/feed");
 const routerAuth = require("./routes/auth");
 const routerMessage = require("./routes/message");
 const http = require('http')
-const { Server } = require('socket.io');
-// const { setupSocketIO, io } = require('./middleware/socket.js');
+const { setupSocketIO } = require('./middleware/socket.js');
 require("dotenv").config();
 
 // Mongo DB Connections
@@ -19,36 +18,10 @@ mongoose
   .catch((error) => {
     console.log("Error in DB connection: " + error);
   });
-  
 
 // Socket
-console.log("1")
-const server = http.createServer(app)
-console.log("2")
-const io = new Server(server, {
-    cors: {
-        origin: '*',
-        methods: ['GET', 'POST']
-    }
-})
-console.log("3")
-
-io.on('connection', (socket) => {
-    console.log(socket.id)
-
-    socket.on("room", (data) => {
-        console.log("room", data)
-        socket.join(data)
-    })
-
-    socket.on('message', async (data) => {
-
-
-          console.log("data", data)
-        socket.to(data.room).emit('messageReturn', data)
-    })
-})
-
+const server = http.createServer(app);
+setupSocketIO(server); 
 
 // Middleware Connections
 app.use(cors());
