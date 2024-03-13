@@ -13,6 +13,20 @@ const messageModel = new mongoose.Schema({
        createAt: {
         type: Date,
         default: Date.now
+       },
+       receiver: {
+            userId: {
+                type: String,
+                required: true
+            },
+            username: {
+                type: String,
+                required: true
+            },
+            avatar: {
+                type: String,
+                default: null
+            }
        }
     }
 
