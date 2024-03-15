@@ -6,7 +6,7 @@ const routerFeed = require("./routes/feed");
 const routerAuth = require("./routes/auth");
 const routerMessage = require("./routes/message");
 const http = require('http')
-const { setupSocketIO } = require('./middleware/socket.js');
+const { setupSocketIO } = require('./controllers/message.js');
 require("dotenv").config();
 
 // Mongo DB Connections

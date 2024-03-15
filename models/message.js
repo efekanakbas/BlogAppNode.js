@@ -28,7 +28,11 @@ const messageModel = new mongoose.Schema({
                 default: null
             }
        }
-    }
+    },
+    roomId: {
+        type: String,
+        required: true
+       }
 
 })
 
