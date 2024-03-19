@@ -5,6 +5,8 @@ const mongoose = require("mongoose");
 const routerFeed = require("./routes/feed");
 const routerAuth = require("./routes/auth");
 const routerMessage = require("./routes/message");
+const routerBlocked = require("./routes/blocked");
+const routerSuggestions = require("./routes/suggestions");
 const http = require('http')
 const { setupSocketIO } = require('./controllers/message.js');
 require("dotenv").config();
@@ -33,6 +35,10 @@ app.use("/uploads", express.static("uploads"));
 app.use("/", routerFeed);
 app.use("/", routerAuth);
 app.use("/", routerMessage)
+app.use("/", routerBlocked)
+app.use("/", routerSuggestions)
+
+
 app.get("/", (req, res) => {
   res.json({
     message: "HELLO WORLD!!!",

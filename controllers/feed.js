@@ -1,6 +1,7 @@
 const feedModel = require("../models/feed.js");
 const authModel = require("../models/auth.js");
 
+
 const feedGET = async (req, res) => {
     try {
       const page = parseInt(req.query.page) || 1;
@@ -84,6 +85,54 @@ const feedGET = async (req, res) => {
       });
     }
   };
+
+  const feedOneGET = async (req, res) => {
+    try {
+      const username = req.params.id;
+      console.log("username", username)
+      
+
+
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+  
+      const startIndex = (page - 1) * limit;
+  
+      // Sayfalama işlemi yapar ve createAt alanına göre sıralar
+      const allFeeds = await feedModel.find({ "user.username": username })
+        .skip(startIndex)
+        .limit(limit)
+        .sort({ "feed.createAt": -1 }) // -1 büyükten küçüğe sıralar
+        .lean();
+
+        console.log("allFEEEDS", allFeeds)
+  
+      // __v ve _id alanlarını çıkarır ve istenen formata dönüştürür
+      const formattedFeeds = allFeeds.map((feed) => {
+        const { __v, _id, ...rest } = feed;
+  
+        const { feed: Ifeed, ...restWithoutFeed } = rest;
+        const lastFeed = { ...Ifeed, feedId: _id };
+        restWithoutFeed.feed = lastFeed;
+  
+        return restWithoutFeed;
+      });
+  
+      res.status(200).json(formattedFeeds);
+
+
+
+
+
+
+    } catch (error) {
+      console.error("Occurs an error while fetching feeds:", error);
+      res.status(500).json({
+        status: "Error",
+        message: "Occurs an error while fetching feeds.",
+      });
+    }
+  }
   
 
-module.exports = { feedGET, feedPOST };
+module.exports = { feedGET, feedPOST, feedOneGET };

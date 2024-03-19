@@ -66,48 +66,49 @@ const registerPOST = async (req, res) => {
 
 const loginPOST = async (req, res) => {
   try {
-    const { email, password } = req.body;
-
-    const user = await authModel.findOne({
-      $or: [
-       { email: email },
-    ]
-    });
-    if (!user) {
-      return res.status(500).json({
-        message: "User not found.",
-      });
-    }
-
-    const comparedPassword = await bcrypt.compare(password, user.password);
-
-    if (!comparedPassword) {
-      return res.status(500).json({
-        message: "Password not match.",
-      });
-    }
-
-    await authModel.findByIdAndUpdate(user._id, { isLogged: true });
-    user.isLogged = true
-
-    const token = jwt.sign(
-      {
-        userId: user._id,
-      },
-      process.env.SECRET_TOKEN,
-      { expiresIn: "7d" }
-    );
-
-    res.status(200).json({
-      status: "200",
-      user: user,
-      token,
-    });
+     const { email, password } = req.body;
+ 
+     const user = await authModel.findOne({
+       $or: [
+        { email: email },
+       ]
+     });
+     if (!user) {
+       return res.status(404).json({
+         message: "User not found.",
+       });
+     }
+ 
+     const comparedPassword = await bcrypt.compare(password, user.password);
+ 
+     if (!comparedPassword) {
+       return res.status(401).json({
+         message: "Password not match.",
+       });
+     }
+ 
+     await authModel.findByIdAndUpdate(user._id, { isLogged: true });
+     user.isLogged = true;
+ 
+     const token = jwt.sign(
+       {
+         userId: user._id,
+       },
+       process.env.SECRET_TOKEN,
+       { expiresIn: "7d" }
+     );
+ 
+     res.status(200).json({
+       status: "200",
+       user: user,
+       token,
+     });
   } catch (error) {
-    console.error("Error,", error);
-    res.status(500).json({ message: "Internal server error" });
+     console.error("Error,", error);
+     res.status(500).json({ message: "Internal server error" });
   }
-};
+ };
+ 
 
 const isLoggedGET = async (req, res) => {
   try {
@@ -152,5 +153,70 @@ const logoutGET = async (req, res) => {
   }
 };
 
+const emailPATCH = async (req, res) => {
+  try {
+     const userId = req.user.userId; 
+     const {email} = req.body;
+     
+     await authModel.findByIdAndUpdate(userId, {email: email});
+ 
+     res.status(200).json({
+       status: "200",
+       message: "Email changing successful."
+     });
+  } catch (error) {
+     console.error("Error,", error);
+     res.status(500).json({ message: "Internal server error" });
+  }
+ }
+ 
 
-module.exports = { registerPOST, loginPOST, logoutGET, isLoggedGET };
+ const passwordPATCH = async (req, res) => {
+  try {
+     const userId = req.user.userId;
+     const {current, newP, confirm} = req.body;
+     const same = newP === confirm;
+ 
+     const user = await authModel.findById(userId)
+
+     console.log("user", user)
+ 
+     if (!user) {
+       res.status(404).json({ message: "User not found" });
+       return;
+     }
+ 
+     const comparedPassword = await bcrypt.compare(current, user.password);
+ 
+     if (!same) {
+       res.status(400).json({ message: "Passwords do not match" });
+       return;
+     }
+ 
+     if (!comparedPassword) {
+       res.status(401).json({ message: "Wrong password" });
+       return;
+     }
+
+     if (newP.length < 8) {
+      res.status(402).json({ message: "Password must be 8 characters or longer" });
+      return;
+    }
+ 
+     const hashedPassword = await bcrypt.hash(newP, 12);
+ 
+     await authModel.findByIdAndUpdate(userId, { password: hashedPassword });
+ 
+     res.status(200).json({
+       status: "200",
+       message: "Password changing successful.",
+     });
+  } catch (error) {
+     console.error("Error,", error);
+     res.status(500).json({ message: "Internal server error" });
+  }
+ }
+ 
+
+
+module.exports = { registerPOST, loginPOST, logoutGET, isLoggedGET, emailPATCH, passwordPATCH };
