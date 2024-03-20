@@ -33,6 +33,146 @@ const authModel = new mongoose.Schema({
     isLogged: {
         type: Boolean,
         default: false
+    },
+    userDetails: {
+        followers: {
+            type: [
+                {
+                   type: Object,
+                   default: null
+                }
+            ],
+            default: []
+        },
+        followersCount:{
+            type: String,
+            default: 0
+        },
+        following:{
+            type: [
+                {
+                   type: Object,
+                   default: null
+                }
+            ],
+            default: []
+        },
+        followingCount:{
+            type: String,
+            default: 0
+        },
+        intro: {
+            type: String,
+            default: null
+        },
+        mainSkills:{
+            type: [
+                {
+                   type: String,
+                   default: null
+                }
+            ],
+            default: []
+        },
+        complementarySkills:{
+            type: [
+                {
+                   type: String,
+                   default: null
+                }
+            ],
+            default: []
+        },
+        interests:{
+            type: [
+                {
+                   type: String,
+                   default: null
+                }
+            ],
+            default: []
+        },
+        experience:{
+            type: [
+                {
+                   company: {
+                    type: String,
+                    default: null
+                   },
+                   title: {
+                    type: String,
+                    default: null
+                   },
+                   contractType: {
+                    type: String,
+                    default: null
+                   },
+                   startDate: {
+                    type: String,
+                    default: null
+                   },
+                   endDate: {
+                    type: String,
+                    default: null
+                   },
+                   current: {
+                    type: Boolean,
+                    default: false
+                   },
+                   missions: {
+                    type: String,
+                    default: null
+                   }
+                }
+            ],
+            default: []
+        },
+        education:{
+            type: [
+                {
+                   school: {
+                    type: String,
+                    default: null
+                   },
+                   degree: {
+                    type: String,
+                    default: null
+                   },
+                   startDate: {
+                    type: String,
+                    default: null
+                   },
+                   endDate: {
+                    type: String,
+                    default: null
+                   },
+                   current: {
+                    type: Boolean,
+                    default: false
+                   },
+                   description: {
+                    type: String,
+                    default: null
+                   }
+                }
+            ],
+            default: []
+        },
+        education:{
+            type: [
+                {
+                   language: {
+                    type: String,
+                    default: null
+                   },
+                   level: {
+                    type: String,
+                    default: null
+                   },
+                }
+            ],
+            default: []
+        },
     }
 })
 
