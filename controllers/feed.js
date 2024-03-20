@@ -49,7 +49,7 @@ const feedGET = async (req, res) => {
       const userId = req.user.userId;
 
   
-      const me = await authModel.findById(userId, { password: 0, __v: 0 }).lean();
+      const me = await authModel.findById(userId, { password: 0, __v: 0, userDetails: 0 }).lean();
       // _id alanını userId olarak yeniden adlandırır
       me.userId = me._id;
       delete me._id;

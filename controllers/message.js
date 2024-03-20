@@ -136,7 +136,7 @@ const messageGET = async (req, res) => {
         const userId = req.user.userId;
         const roomId = [userId, receiverId].sort().join('-');
   
-      const me = await authModel.findById(userId, { password: 0, __v: 0 }).lean();
+      const me = await authModel.findById(userId, { password: 0, __v: 0, userDetails: 0 }).lean();
       me.userId = me._id;
       delete me._id;
   
