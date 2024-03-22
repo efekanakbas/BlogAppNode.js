@@ -88,7 +88,7 @@ const feedGET = async (req, res) => {
 
   const feedOneGET = async (req, res) => {
     try {
-      const username = req.params.id;
+      const username = req.params.username;
       console.log("username", username)
       
 

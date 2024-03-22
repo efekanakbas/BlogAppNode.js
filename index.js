@@ -7,6 +7,7 @@ const routerAuth = require("./routes/auth");
 const routerMessage = require("./routes/message");
 const routerBlocked = require("./routes/blocked");
 const routerSuggestions = require("./routes/suggestions");
+const routerUser = require("./routes/user");
 const http = require('http')
 const { setupSocketIO } = require('./controllers/message.js');
 require("dotenv").config();
@@ -37,6 +38,7 @@ app.use("/", routerAuth);
 app.use("/", routerMessage)
 app.use("/", routerBlocked)
 app.use("/", routerSuggestions)
+app.use("/", routerUser)
 
 
 app.get("/", (req, res) => {

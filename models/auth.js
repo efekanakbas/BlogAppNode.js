@@ -48,7 +48,7 @@ const authModel = new mongoose.Schema({
             type: String,
             default: 0
         },
-        following:{
+        followings:{
             type: [
                 {
                    type: Object,
@@ -57,7 +57,7 @@ const authModel = new mongoose.Schema({
             ],
             default: []
         },
-        followingCount:{
+        followingsCount:{
             type: String,
             default: 0
         },
@@ -92,7 +92,7 @@ const authModel = new mongoose.Schema({
             ],
             default: []
         },
-        experience:{
+        experiences:{
             type: [
                 {
                    company: {
@@ -127,7 +127,7 @@ const authModel = new mongoose.Schema({
             ],
             default: []
         },
-        education:{
+        educations:{
             type: [
                 {
                    school: {
@@ -158,7 +158,7 @@ const authModel = new mongoose.Schema({
             ],
             default: []
         },
-        education:{
+        languages:{
             type: [
                 {
                    language: {
