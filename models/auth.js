@@ -65,6 +65,14 @@ const authModel = new mongoose.Schema({
             type: String,
             default: null
         },
+        location: {
+            type: String,
+            default: null
+        },
+        job: {
+            type: String,
+            default: null
+        },
         mainSkills:{
             type: [
                 {

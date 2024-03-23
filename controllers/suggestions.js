@@ -16,7 +16,7 @@ const suggestionsGET = async (req, res) => {
 
     // __v ve _id alanlarını çıkarır ve istenen formata dönüştürür
     const formattedRandom = randoms.map((random) => {
-        const { __v, _id, ...rest } = random;
+        const { __v, _id, password, userDetails, ...rest } = random;
   
         rest.userId = _id
   
