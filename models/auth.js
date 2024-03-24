@@ -130,6 +130,10 @@ const authModel = new mongoose.Schema({
                    missions: {
                     type: String,
                     default: null
+                   },
+                   itemId: {
+                    type: String,
+                    required: true
                    }
                 }
             ],
@@ -161,6 +165,10 @@ const authModel = new mongoose.Schema({
                    description: {
                     type: String,
                     default: null
+                   },
+                   itemId: {
+                    type: String,
+                    required: true
                    }
                 }
             ],
@@ -176,6 +184,10 @@ const authModel = new mongoose.Schema({
                    level: {
                     type: String,
                     default: null
+                   },
+                   itemId: {
+                    type: String,
+                    required: true
                    },
                 }
             ],

@@ -49,14 +49,12 @@ const detailsGET = async (req, res) => {
 const locationPATCH = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const {location} = req.body
-    const me = await authModel
-      .findById(userId, { userDetails: 1 })
+    const { location } = req.body;
+    const me = await authModel.findById(userId, { userDetails: 1 });
 
-    me.userDetails.location = location
+    me.userDetails.location = location;
 
-    me.save()
-  
+    me.save();
 
     res.status(200).json({
       status: 200,
@@ -74,14 +72,12 @@ const locationPATCH = async (req, res) => {
 const jobPATCH = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const {job} = req.body
-    const me = await authModel
-      .findById(userId, { userDetails: 1 })
+    const { job } = req.body;
+    const me = await authModel.findById(userId, { userDetails: 1 });
 
-    me.userDetails.job = job
+    me.userDetails.job = job;
 
-    me.save()
-  
+    me.save();
 
     res.status(200).json({
       status: 200,
@@ -97,61 +93,78 @@ const jobPATCH = async (req, res) => {
 };
 
 const skillsPATCH = async (req, res) => {
-try {
-  const userId = req.user.userId;
-    const {main, complementary, interest} = req.body
-    const me = await authModel
-      .findById(userId, { userDetails: 1 })
+  try {
+    const userId = req.user.userId;
+    const { main, complementary, interest } = req.body;
+    const me = await authModel.findById(userId, { userDetails: 1 });
 
-      me.userDetails.mainSkills = me.userDetails.mainSkills.concat(main)
-      me.userDetails.complementarySkills = me.userDetails.complementarySkills.concat(complementary)
-      me.userDetails.interests = me.userDetails.interests.concat(interest)
+    me.userDetails.mainSkills = main;
+    me.userDetails.complementarySkills = complementary;
+    me.userDetails.interests = interest;
 
-      me.save()
+    me.save();
 
-      res.status(200).json({
-        status: 200,
-        message: "You have successfully updated your skills",
-        me
-      });
-
-} catch (error) {
-  console.error("Occurs an error while patching skills:", error);
-  res.status(500).json({
-    status: "Error",
-    message: "Occurs an error while patching skills.",
-  });
-}
-}
+    res.status(200).json({
+      status: 200,
+      message: "You have successfully updated your skills",
+      me,
+    });
+  } catch (error) {
+    console.error("Occurs an error while patching skills:", error);
+    res.status(500).json({
+      status: "Error",
+      message: "Occurs an error while patching skills.",
+    });
+  }
+};
 
 const experiencesPATCH = async (req, res) => {
   try {
     const userId = req.user.userId;
-      const {company, title, contractType, startDate, endDate, current, missions} = req.body
+    const {
+      company,
+      title,
+      contractType,
+      startDate,
+      endDate,
+      current,
+      missions,
+      itemId,
+      edit,
+      del,
+    } = req.body;
 
-      const obj = {
-        company:company,
-        title: title,
-        contractType: contractType,
-        startDate: startDate,
-        endDate: endDate,
-        current: current,
-        missions: missions
-      }
+    const obj = {
+      company: company,
+      title: title,
+      contractType: contractType,
+      startDate: startDate,
+      endDate: endDate,
+      current: current,
+      missions: missions,
+      itemId: itemId,
+    };
 
+    if (edit) {
+      await authModel.updateOne(
+        { _id: userId, "userDetails.experiences.itemId": itemId },
+        { $set: { "userDetails.experiences.$": obj } }
+      );
+    } else if (del) {
+      await authModel.updateOne(
+        { _id: userId },
+        { $pull: { "userDetails.experiences": { itemId: itemId } } }
+      );
+    } else {
+      const me = await authModel.findById(userId, { userDetails: 1 });
+      me.userDetails.experiences.push(obj);
+      await me.save();
+    }
 
-      const me = await authModel
-        .findById(userId, { userDetails: 1 })
-
-        me.userDetails.experiences.push(obj) 
-  
-        me.save()
-  
-        res.status(200).json({
-          status: 200,
-          message: "You have successfully updated your experiences"
-        });
-  
+    res.status(200).json({
+      status: 200,
+      message: "You have successfully updated your experiences",
+    });
   } catch (error) {
     console.error("Occurs an error while patching experiences:", error);
     res.status(500).json({
@@ -159,101 +172,132 @@ const experiencesPATCH = async (req, res) => {
       message: "Occurs an error while patching experiences.",
     });
   }
+};
+
+const educationsPATCH = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const {
+      school,
+      degree,
+      startDate,
+      endDate,
+      current,
+      description,
+      itemId,
+      edit,
+      del
+    } = req.body;
+
+    const obj = {
+      school: school,
+      degree: degree,
+      startDate: startDate,
+      endDate: endDate,
+      current: current,
+      description: description,
+      itemId: itemId,
+    };
+
+    if (edit) {
+      await authModel.updateOne(
+        { _id: userId, "userDetails.educations.itemId": itemId },
+        { $set: { "userDetails.educations.$": obj } }
+      );
+    }  else if (del) {
+      await authModel.updateOne(
+        { _id: userId },
+        { $pull: { "userDetails.educations": { itemId: itemId } } }
+      );
+    } else {
+      const me = await authModel.findById(userId, { userDetails: 1 });
+      me.userDetails.educations.push(obj);
+      await me.save();
+    }
+
+    res.status(200).json({
+      status: 200,
+      message: "You have successfully updated your educations",
+    });
+  } catch (error) {
+    console.error("Occurs an error while patching educations:", error);
+    res.status(500).json({
+      status: "Error",
+      message: "Occurs an error while patching educations.",
+    });
   }
+};
 
-  const educationsPATCH = async (req, res) => {
-    try {
-      const userId = req.user.userId;
-        const {school, degree, startDate, endDate, current, description} = req.body
-  
-        const obj = {
-          school:school,
-          degree: degree,
-          startDate: startDate,
-          endDate: endDate,
-          current: current,
-          description: description
-        }
-  
-  
-        const me = await authModel
-          .findById(userId, { userDetails: 1 })
-  
-          me.userDetails.educations.push(obj) 
-    
-          me.save()
-    
-          res.status(200).json({
-            status: 200,
-            message: "You have successfully updated your educations"
-          });
-    
-    } catch (error) {
-      console.error("Occurs an error while patching educations:", error);
-      res.status(500).json({
-        status: "Error",
-        message: "Occurs an error while patching educations.",
-      });
-    }
+const languagesPATCH = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { language, level, itemId, edit, del } = req.body;
+
+    const obj = {
+      language: language,
+      level: level,
+      itemId: itemId,
+    };
+
+    if (edit) {
+      await authModel.updateOne(
+        { _id: userId, "userDetails.languages.itemId": itemId },
+        { $set: { "userDetails.languages.$": obj } }
+      );
+    } else if (del) {
+      await authModel.updateOne(
+        { _id: userId },
+        { $pull: { "userDetails.languages": { itemId: itemId } } }
+      );
+    } else {
+      const me = await authModel.findById(userId, { userDetails: 1 });
+      me.userDetails.languages.push(obj);
+      await me.save();
     }
 
-    const languagesPATCH = async (req, res) => {
-      try {
-        const userId = req.user.userId;
-          const {language, level} = req.body
-    
-          const obj = {
-            language:language,
-            level: level,
-          }
-    
-    
-          const me = await authModel
-            .findById(userId, { userDetails: 1 })
-    
-            me.userDetails.languages.push(obj) 
-      
-            me.save()
-      
-            res.status(200).json({
-              status: 200,
-              message: "You have successfully updated your languages"
-            });
-      
-      } catch (error) {
-        console.error("Occurs an error while patching languages:", error);
-        res.status(500).json({
-          status: "Error",
-          message: "Occurs an error while patching languages.",
-        });
-      }
-      }
+    res.status(200).json({
+      status: 200,
+      message: "You have successfully updated your languages",
+    });
+  } catch (error) {
+    console.error("Occurs an error while patching languages:", error);
+    res.status(500).json({
+      status: "Error",
+      message: "Occurs an error while patching languages.",
+    });
+  }
+};
 
-      const introPATCH = async (req, res) => {
-        try {
-          const userId = req.user.userId;
-          const {intro} = req.body
-          const me = await authModel
-            .findById(userId, { userDetails: 1 })
-      
-          me.userDetails.intro = intro
-      
-          me.save()
-        
-      
-          res.status(200).json({
-            status: 200,
-            message: "You have successfully updated your intro",
-          });
-        } catch (error) {
-          console.error("Occurs an error while patching intro:", error);
-          res.status(500).json({
-            status: "Error",
-            message: "Occurs an error while patching intro.",
-          });
-        }
-      };
+const introPATCH = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { intro } = req.body;
+    const me = await authModel.findById(userId, { userDetails: 1 });
 
+    me.userDetails.intro = intro;
 
+    me.save();
 
-module.exports = { detailsGET, locationPATCH, jobPATCH, skillsPATCH, experiencesPATCH, educationsPATCH, languagesPATCH, introPATCH };
+    res.status(200).json({
+      status: 200,
+      message: "You have successfully updated your intro",
+    });
+  } catch (error) {
+    console.error("Occurs an error while patching intro:", error);
+    res.status(500).json({
+      status: "Error",
+      message: "Occurs an error while patching intro.",
+    });
+  }
+};
+
+module.exports = {
+  detailsGET,
+  locationPATCH,
+  jobPATCH,
+  skillsPATCH,
+  experiencesPATCH,
+  educationsPATCH,
+  languagesPATCH,
+  introPATCH,
+};
