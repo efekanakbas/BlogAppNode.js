@@ -5,9 +5,12 @@ const streamifier = require('streamifier');
 
 // Cloudinary configurations
 cloudinary.config({
- cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
- api_key: process.env.CLOUDINARY_API_KEY,
- api_secret: process.env.CLOUDINARY_API_SECRET,
+//  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+//  api_key: process.env.CLOUDINARY_API_KEY,
+//  api_secret: process.env.CLOUDINARY_API_SECRET,
+cloud_name: "djgg4wjct",
+ api_key: "419886385413456",
+ api_secret: "7F71KL1LXG0P3FGMQZHNmJORvkQ",
 });
 
 // Multer configurations

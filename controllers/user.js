@@ -1,4 +1,6 @@
 const authModel = require("../models/auth.js");
+const feedModel = require("../models/feed.js");
+const { ObjectId } = require("mongodb");
 
 const detailsGET = async (req, res) => {
   try {
@@ -186,7 +188,7 @@ const educationsPATCH = async (req, res) => {
       description,
       itemId,
       edit,
-      del
+      del,
     } = req.body;
 
     const obj = {
@@ -204,7 +206,7 @@ const educationsPATCH = async (req, res) => {
         { _id: userId, "userDetails.educations.itemId": itemId },
         { $set: { "userDetails.educations.$": obj } }
       );
-    }  else if (del) {
+    } else if (del) {
       await authModel.updateOne(
         { _id: userId },
         { $pull: { "userDetails.educations": { itemId: itemId } } }
@@ -291,6 +293,77 @@ const introPATCH = async (req, res) => {
   }
 };
 
+const avatarPATCH = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const objectId = new ObjectId(userId);
+    const images = req.body.images;
+
+    const updatedUser = await authModel.findByIdAndUpdate(
+      userId,
+      { $set: { avatar: images[0] } },
+      { new: true, select: "-userDetails -password -isLogged -__v" }
+    );
+
+    // Eğer eşleşen belgeler varsa, avatarı güncelleyin
+    await feedModel.updateMany(
+      { 'user.userId': objectId }, 
+      { 'user.avatar': images[0] } 
+   );
+
+    // Check if the user was found and updated
+    if (!updatedUser) {
+      return res.status(404).json({
+        status: "Error",
+        message: "User not found.",
+      });
+    }
+
+    res.status(200).json({
+      updatedUser,
+      images,
+    });
+  } catch (error) {
+    console.error("Occurs an error while patching avatar:", error);
+    res.status(500).json({
+      status: "Error",
+      message: "Occurs an error while patching avatar.",
+    });
+  }
+};
+
+const coverPATCH = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const images = req.body.images;
+
+    const updatedUser = await authModel.findByIdAndUpdate(
+      userId,
+      { $set: { cover: images[0] } },
+      { new: true, select: "-userDetails -password -isLogged -__v" }
+    );
+
+    // Check if the user was found and updated
+    if (!updatedUser) {
+      return res.status(404).json({
+        status: "Error",
+        message: "User not found.",
+      });
+    }
+
+    res.status(200).json({
+      updatedUser,
+      images,
+    });
+  } catch (error) {
+    console.error("Occurs an error while patching cover:", error);
+    res.status(500).json({
+      status: "Error",
+      message: "Occurs an error while patching cover.",
+    });
+  }
+};
+
 module.exports = {
   detailsGET,
   locationPATCH,
@@ -300,4 +373,6 @@ module.exports = {
   educationsPATCH,
   languagesPATCH,
   introPATCH,
+  avatarPATCH,
+  coverPATCH,
 };

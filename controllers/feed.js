@@ -44,7 +44,7 @@ const feedGET = async (req, res) => {
   const feedPOST = async (req, res) => {
     try {
       const { text, liked, likeCount, commentsCount, comments, hashtags, mentions, location } = req.body;
-      console.log("BODY", req.body)
+      // console.log("BODY", req.body)
       const images = req.body.images; // req.body.images üzerinden resimlerin URL'lerine erişin
       const userId = req.user.userId;
 
@@ -89,7 +89,7 @@ const feedGET = async (req, res) => {
   const feedOneGET = async (req, res) => {
     try {
       const username = req.params.username;
-      console.log("username", username)
+      // console.log("username", username)
       
 
 
@@ -105,7 +105,7 @@ const feedGET = async (req, res) => {
         .sort({ "feed.createAt": -1 }) // -1 büyükten küçüğe sıralar
         .lean();
 
-        console.log("allFEEEDS", allFeeds)
+        // console.log("allFEEEDS", allFeeds)
   
       // __v ve _id alanlarını çıkarır ve istenen formata dönüştürür
       const formattedFeeds = allFeeds.map((feed) => {
