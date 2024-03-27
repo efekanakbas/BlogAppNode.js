@@ -8,7 +8,6 @@ const messageModel = new mongoose.Schema({
     message: {
        text: {
         type: String,
-        required: true
        },
        createAt: {
         type: Date,
