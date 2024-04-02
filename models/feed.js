@@ -31,6 +31,17 @@ const feedModel = new Schema({
             type: Number,
             default: 0
         },
+        likePerson: {
+            type: [
+                {
+                     
+                 type: Object,
+                required: true
+                    
+                }
+            ],
+            default: []
+        },
         commentsCount: {
             type: Number,
             default: 0

@@ -179,7 +179,7 @@ const emailPATCH = async (req, res) => {
  
      const user = await authModel.findById(userId)
 
-     console.log("user", user)
+    //  console.log("user", user)
  
      if (!user) {
        res.status(404).json({ message: "User not found" });

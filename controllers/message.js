@@ -17,7 +17,7 @@ const setupSocketIO = (server) => {
 
   io.on("connection", (socket) => {
     socket.on("room", (data) => {
-      console.log("SOCKETROOM", data)
+      // console.log("SOCKETROOM", data)
        socket.join(data);
     });
    
@@ -170,7 +170,7 @@ const messageGET = async (req, res) => {
       });
   
       // Mesajın alıcısına gönderin
-      console.log("EMİTROOM", roomId)
+      // console.log("EMİTROOM", roomId)
       io.to(roomId).emit("messageReturn", restWithoutMessage);
   } catch (error) {
       console.error("Occurs an error while creating a message:", error);

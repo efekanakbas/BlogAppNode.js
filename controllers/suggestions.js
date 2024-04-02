@@ -5,7 +5,7 @@ const { ObjectId } = require('mongodb');
 const suggestionsGET = async (req, res) => {
   const userId = req.user.userId;
   const userIdObjectId = new ObjectId(userId);
-  console.log("userId", userId);
+  // console.log("userId", userId);
   try {
 
     // userId'ye eşit olmayan belgeleri rastgele sıralayarak döndür
