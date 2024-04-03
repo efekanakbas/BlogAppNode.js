@@ -45,6 +45,7 @@ const feedGET = async (req, res) => {
         restWithoutFeed.feed.liked = false;
       }
 
+      // feed yorunlarının beğenme durumunu kontrol eder
       restWithoutFeed.feed.comments.map((item) => {
         const isLiked = () => {
           return item.comment.likePerson.some(
@@ -177,6 +178,22 @@ const feedOneGET = async (req, res) => {
       } else {
         restWithoutFeed.feed.liked = false;
       }
+
+       // feed yorunlarının beğenme durumunu kontrol eder
+       restWithoutFeed.feed.comments.map((item) => {
+        const isLiked = () => {
+          return item.comment.likePerson.some(
+            (item) => item.userId.toString() === userId
+          );
+        };
+
+        if (isLiked()) {
+          item.comment.liked = true;
+        } else {
+          item.comment.liked = false;
+        }
+        return restWithoutFeed
+      })
 
       restWithoutFeed.feed.comments = restWithoutFeed.feed.comments.reverse();
       return restWithoutFeed;
