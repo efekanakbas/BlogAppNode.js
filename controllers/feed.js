@@ -25,9 +25,13 @@ const feedGET = async (req, res) => {
       const lastFeed = { ...Ifeed, feedId: _id };
       restWithoutFeed.feed = lastFeed;
 
-      console.log("userId", userId)
-      console.log("first",  restWithoutFeed.feed.likePerson)
-
+      // comments içindeki _id'yi commentId olarak comment içine yerleştirir
+      restWithoutFeed.feed.comments.map((item) => {
+        const { _id: mongoId, ...rest } = item;
+        rest.comment.commentId = mongoId.toString();
+        rest.comment.parentId = _id.toString();
+        delete item._id;
+      });
 
       const isLiked = () => {
         return restWithoutFeed.feed.likePerson.some(
@@ -41,6 +45,22 @@ const feedGET = async (req, res) => {
         restWithoutFeed.feed.liked = false;
       }
 
+      restWithoutFeed.feed.comments.map((item) => {
+        const isLiked = () => {
+          return item.comment.likePerson.some(
+            (item) => item.userId.toString() === userId
+          );
+        };
+
+        if (isLiked()) {
+          item.comment.liked = true;
+        } else {
+          item.comment.liked = false;
+        }
+        return restWithoutFeed
+      })
+
+      restWithoutFeed.feed.comments = restWithoutFeed.feed.comments.reverse();
       return restWithoutFeed;
     });
 
@@ -138,6 +158,14 @@ const feedOneGET = async (req, res) => {
       const lastFeed = { ...Ifeed, feedId: _id };
       restWithoutFeed.feed = lastFeed;
 
+      // comments içindeki _id'yi commentId olarak comment içine yerleştirir
+      restWithoutFeed.feed.comments.map((item) => {
+        const { _id: mongoId, ...rest } = item;
+        rest.comment.commentId = mongoId.toString();
+        rest.comment.parentId = _id.toString();
+        delete item._id;
+      });
+
       const isLiked = () => {
         return restWithoutFeed.feed.likePerson.some(
           (item) => item.userId.toString() === userId
@@ -150,6 +178,7 @@ const feedOneGET = async (req, res) => {
         restWithoutFeed.feed.liked = false;
       }
 
+      restWithoutFeed.feed.comments = restWithoutFeed.feed.comments.reverse();
       return restWithoutFeed;
     });
 
@@ -165,7 +194,7 @@ const feedOneGET = async (req, res) => {
 
 const likePOST = async (req, res) => {
   try {
-    const { parentId, status  } = req.body;
+    const { parentId, status, type, commentId } = req.body;
     const userId = req.user.userId;
 
     const me = await authModel
@@ -177,14 +206,34 @@ const likePOST = async (req, res) => {
 
     const feed = await feedModel.findById(parentId);
 
-    if(status === 1) {
-      feed.feed.likeCount += 1;
+    if (type === "feed") {
+      if (status === 1) {
+        feed.feed.likeCount += 1;
 
-      feed.feed.likePerson.push(me);
+        feed.feed.likePerson.push(me);
+      } else {
+        feed.feed.likeCount -= 1;
+
+        feed.feed.likePerson = feed.feed.likePerson.filter(
+          (item) => item.userId.toString() !== userId
+        );
+      }
     } else {
-      feed.feed.likeCount -= 1;
+      const selectedComment = feed.feed.comments.find((item) => item._id.toString() === commentId);
 
-      feed.feed.likePerson = feed.feed.likePerson.filter((item) => item.userId.toString() !== userId)
+      console.log("selectedComment", selectedComment)
+
+      if (status === 1) {
+        selectedComment.comment.likesCount += 1;
+
+        selectedComment.comment.likePerson.push(me);
+      } else {
+        selectedComment.comment.likesCount -= 1;
+
+        selectedComment.comment.likePerson = feed.feed.likePerson.filter(
+          (item) => item.userId.toString() !== userId
+        );
+      }
     }
 
     feed.save();
@@ -199,5 +248,51 @@ const likePOST = async (req, res) => {
   }
 };
 
+const commentPOST = async (req, res) => {
+  try {
+    const { parentId, text } = req.body;
+    const userId = req.user.userId;
 
-module.exports = { feedGET, feedPOST, feedOneGET, likePOST };
+    const me = await authModel
+      .findById(userId, { password: 0, __v: 0, userDetails: 0, isLogged: 0 })
+      .lean();
+    // _id alanını userId olarak yeniden adlandırır
+    me.userId = me._id;
+    delete me._id;
+
+    const feed = await feedModel.findById(parentId);
+
+    const comment = {
+      user: me,
+      comment: {
+        text: text,
+      },
+    };
+
+    feed.feed.comments.push(comment);
+
+    feed.feed.commentsCount += 1;
+
+    feed.save();
+
+    // console.log("feed", feed)
+    const formattedComment = feed.feed.comments.map((item) => {
+      // console.log("item", item);
+      const { _id: mongoId, ...rest } = item.toObject();
+      console.log("rest", rest);
+      rest.comment.commentId = mongoId.toString();
+
+      return rest;
+    });
+
+    res.status(201).json(formattedComment);
+  } catch (error) {
+    console.error("Occurs an error while posting comment:", error);
+    res.status(500).json({
+      status: "Error",
+      message: "Occurs an error while posting comment.",
+    });
+  }
+};
+
+module.exports = { feedGET, feedPOST, feedOneGET, likePOST, commentPOST };
