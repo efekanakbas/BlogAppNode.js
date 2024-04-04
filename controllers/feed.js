@@ -58,8 +58,8 @@ const feedGET = async (req, res) => {
         } else {
           item.comment.liked = false;
         }
-        return restWithoutFeed
-      })
+        return restWithoutFeed;
+      });
 
       restWithoutFeed.feed.comments = restWithoutFeed.feed.comments.reverse();
       return restWithoutFeed;
@@ -91,9 +91,7 @@ const feedPOST = async (req, res) => {
     const images = req.body.images; // req.body.images üzerinden resimlerin URL'lerine erişin
     const userId = req.user.userId;
 
-    const me = await authModel
-      .findById(userId, { password: 0, __v: 0, userDetails: 0 })
-      .lean();
+    const me = await authModel.findById(userId, { password: 0, __v: 0 }).lean();
     // _id alanını userId olarak yeniden adlandırır
     me.userId = me._id;
     delete me._id;
@@ -179,8 +177,8 @@ const feedOneGET = async (req, res) => {
         restWithoutFeed.feed.liked = false;
       }
 
-       // feed yorunlarının beğenme durumunu kontrol eder
-       restWithoutFeed.feed.comments.map((item) => {
+      // feed yorunlarının beğenme durumunu kontrol eder
+      restWithoutFeed.feed.comments.map((item) => {
         const isLiked = () => {
           return item.comment.likePerson.some(
             (item) => item.userId.toString() === userId
@@ -192,8 +190,8 @@ const feedOneGET = async (req, res) => {
         } else {
           item.comment.liked = false;
         }
-        return restWithoutFeed
-      })
+        return restWithoutFeed;
+      });
 
       restWithoutFeed.feed.comments = restWithoutFeed.feed.comments.reverse();
       return restWithoutFeed;
@@ -236,9 +234,11 @@ const likePOST = async (req, res) => {
         );
       }
     } else {
-      const selectedComment = feed.feed.comments.find((item) => item._id.toString() === commentId);
+      const selectedComment = feed.feed.comments.find(
+        (item) => item._id.toString() === commentId
+      );
 
-      console.log("selectedComment", selectedComment)
+      console.log("selectedComment", selectedComment);
 
       if (status === 1) {
         selectedComment.comment.likesCount += 1;
@@ -312,4 +312,38 @@ const commentPOST = async (req, res) => {
   }
 };
 
-module.exports = { feedGET, feedPOST, feedOneGET, likePOST, commentPOST };
+const feedDELETE = async (req, res) => {
+  try {
+    const { parentId, type, commentId } = req.body;
+
+    if (type === "feed") {
+      await feedModel.findByIdAndDelete(parentId);
+    } else {
+      const feed = await feedModel.findById(parentId);
+      feed.feed.commentsCount -= 1
+      feed.feed.comments = feed.feed.comments.filter(
+        (item) => item._id.toString() !== commentId
+      );
+      await feed.save();
+    }
+
+    res.status(200).json({
+      message: "You have deleted successfully",
+    });
+  } catch (error) {
+    console.error("Occurs an error while deleting:", error);
+    res.status(500).json({
+      status: "Error",
+      message: "Occurs an error while deleting.",
+    });
+  }
+};
+
+module.exports = {
+  feedGET,
+  feedPOST,
+  feedOneGET,
+  likePOST,
+  commentPOST,
+  feedDELETE,
+};
