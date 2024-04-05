@@ -45,8 +45,17 @@ const authModel = new mongoose.Schema({
             default: []
         },
         followersCount:{
-            type: String,
+            type: Number,
             default: 0
+        },
+        blocked: {
+            type: [
+                {
+                   type: Object,
+                   default: null
+                }
+            ],
+            default: []
         },
         followings:{
             type: [
@@ -58,7 +67,7 @@ const authModel = new mongoose.Schema({
             default: []
         },
         followingsCount:{
-            type: String,
+            type: Number,
             default: 0
         },
         intro: {

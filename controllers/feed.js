@@ -9,13 +9,20 @@ const feedGET = async (req, res) => {
 
     const startIndex = (page - 1) * limit;
 
+
+    const me = await authModel.findById(userId , {"__v":0  })
+
+    const blockedUsernames = me.userDetails.blocked.map(blockedUser => blockedUser.username);
+
     // Sayfalama işlemi yapar ve createAt alanına göre sıralar
     const allFeeds = await feedModel
-      .find()
+      .find({ "user.username": { $nin: blockedUsernames } })
       .skip(startIndex)
       .limit(limit)
       .sort({ "feed.createAt": -1 }) // -1 büyükten küçüğe sıralar
       .lean();
+
+      // console.log("allFeeds", allFeeds)
 
     // __v ve _id alanlarını çıkarır ve istenen formata dönüştürür
     const formattedFeeds = allFeeds.map((feed) => {
@@ -45,6 +52,18 @@ const feedGET = async (req, res) => {
         restWithoutFeed.feed.liked = false;
       }
 
+      const isFollowed = () => {
+        return restWithoutFeed.user.userDetails.followers.some(
+          (item) => item._id.toString() === userId
+        );
+      };
+
+      if (isFollowed()) {
+        restWithoutFeed.user.followed = true;
+      } else {
+        restWithoutFeed.user.followed = false;
+      }
+
       // feed yorunlarının beğenme durumunu kontrol eder
       restWithoutFeed.feed.comments.map((item) => {
         const isLiked = () => {
@@ -57,6 +76,25 @@ const feedGET = async (req, res) => {
           item.comment.liked = true;
         } else {
           item.comment.liked = false;
+        }
+        return restWithoutFeed;
+      });
+
+      // console.log("restWithoutFeed", restWithoutFeed)
+
+      // feed yorunlarını atanın takip edilme durumunu kontrol eder
+      restWithoutFeed.feed.comments.map((item) => {
+        // console.log("item", item)
+        const isFollowed = () => {
+          return item.user.userDetails.followers.some(
+            (item) => item._id.toString() === userId
+          );
+        };
+
+        if (isFollowed()) {
+          item.user.followed = true;
+        } else {
+          item.user.followed = false;
         }
         return restWithoutFeed;
       });
@@ -177,6 +215,18 @@ const feedOneGET = async (req, res) => {
         restWithoutFeed.feed.liked = false;
       }
 
+      const isFollowed = () => {
+        return restWithoutFeed.user.userDetails.followers.some(
+          (item) => item._id.toString() === userId
+        );
+      };
+
+      if (isFollowed()) {
+        restWithoutFeed.user.followed = true;
+      } else {
+        restWithoutFeed.user.followed = false;
+      }
+
       // feed yorunlarının beğenme durumunu kontrol eder
       restWithoutFeed.feed.comments.map((item) => {
         const isLiked = () => {
@@ -193,9 +243,28 @@ const feedOneGET = async (req, res) => {
         return restWithoutFeed;
       });
 
+       // feed yorunlarını atanın takip edilme durumunu kontrol eder
+       restWithoutFeed.feed.comments.map((item) => {
+        // console.log("item", item)
+        const isFollowed = () => {
+          return item.user.userDetails.followers.some(
+            (item) => item._id.toString() === userId
+          );
+        };
+
+        if (isFollowed()) {
+          item.user.followed = true;
+        } else {
+          item.user.followed = false;
+        }
+        return restWithoutFeed;
+      });
+
       restWithoutFeed.feed.comments = restWithoutFeed.feed.comments.reverse();
       return restWithoutFeed;
     });
+
+    
 
     res.status(200).json(formattedFeeds);
   } catch (error) {
@@ -271,7 +340,7 @@ const commentPOST = async (req, res) => {
     const userId = req.user.userId;
 
     const me = await authModel
-      .findById(userId, { password: 0, __v: 0, userDetails: 0, isLogged: 0 })
+      .findById(userId, { password: 0, __v: 0, isLogged: 0 })
       .lean();
     // _id alanını userId olarak yeniden adlandırır
     me.userId = me._id;

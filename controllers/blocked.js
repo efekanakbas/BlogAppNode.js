@@ -1,20 +1,42 @@
-const blockedModel = require("../models/blocked.js");
+const authModel = require("../models/auth.js");
+const feedModel = require("../models/feed.js");
+const { ObjectId } = require("mongodb");
 
 const blockedPOST = async (req, res) => {
   try {
-    const { userId, avatar, username, text } = req.body;
+    const { username } = req.body;
+    const userId = req.user.userId
 
-    const newBlocked = (
-      await blockedModel.create({ userId, avatar, username, text })
-    ).toObject();
+    
 
-    const {__v, _id, ...formattedBlocked} = newBlocked 
+    const user = await authModel.findOne({ "username": username }, { "userDetails": 0, "__v":0, "isLogged":0, "password": 0  });
 
-    res.status(201).json({
-        post: formattedBlocked,
-      });
-  } catch (error) 
-  {
+    const me = await authModel.findById(userId , {"__v":0  });
+
+    
+
+    if(me.userDetails.blocked.some((item) => item.username === username)) {
+      res.status(401).json({
+        message: "You have already blocked!"
+      })
+      return
+    }
+
+    await feedModel.updateMany(
+      { "user.userId": new ObjectId(userId) }, // Güncellenmesi gereken belirli kriterler
+      {
+        // Güncelleme işlemleri
+        $push: { "user.userDetails.blocked": user }, // Me'yi ekle
+      }
+    );
+
+    me.userDetails.blocked.push(user)
+
+    me.save()
+
+
+    res.status(201).json(me);
+  } catch (error) {
     console.error("Occurs an error while creating a blocked list:", error);
     res.status(500).json({
       status: "Error",
@@ -25,19 +47,11 @@ const blockedPOST = async (req, res) => {
 
 const blockedGET = async (req, res) => {
   try {
+    const userId = req.user.userId
+    const me = await authModel.findById(userId , {"__v":0  });
 
-    const blockedAll = await blockedModel.find().lean();
 
-     // __v ve _id alanlarını çıkarır ve istenen formata dönüştürür
-     const formattedBlocked = blockedAll.map((blocked) => {
-      const { __v, _id, ...rest } = blocked;
-
-      rest.itemId = _id
-
-      return rest;
-    });
-
-    res.status(200).json(formattedBlocked)
+    res.status(200).json(me.userDetails.blocked);
   } catch (error) {
     console.error("Occurs an error while fetching blocked list:", error);
     res.status(500).json({
@@ -45,6 +59,6 @@ const blockedGET = async (req, res) => {
       message: "Occurs an error while fetching blocked list.",
     });
   }
-}
+};
 
-module.exports = {blockedPOST, blockedGET}
+module.exports = { blockedPOST, blockedGET };
