@@ -9,20 +9,26 @@ const feedGET = async (req, res) => {
 
     const startIndex = (page - 1) * limit;
 
+    const me = await authModel.findById(userId, { __v: 0 });
 
-    const me = await authModel.findById(userId , {"__v":0  })
+    const blockedUsernames = me.userDetails.blocked.map(
+      (blockedUser) => blockedUser.username
+    );
+    const blockedUsernames2 = me.userDetails.blockedBy.map(
+      (blockedByUser) => blockedByUser.username
+    );
 
-    const blockedUsernames = me.userDetails.blocked.map(blockedUser => blockedUser.username);
+    const allBlockedUsernames = blockedUsernames.concat(blockedUsernames2);
 
     // Sayfalama işlemi yapar ve createAt alanına göre sıralar
     const allFeeds = await feedModel
-      .find({ "user.username": { $nin: blockedUsernames } })
+      .find({ "user.username": { $nin: allBlockedUsernames } })
       .skip(startIndex)
       .limit(limit)
       .sort({ "feed.createAt": -1 }) // -1 büyükten küçüğe sıralar
       .lean();
 
-      // console.log("allFeeds", allFeeds)
+    // console.log("allFeeds", allFeeds)
 
     // __v ve _id alanlarını çıkarır ve istenen formata dönüştürür
     const formattedFeeds = allFeeds.map((feed) => {
@@ -87,7 +93,10 @@ const feedGET = async (req, res) => {
         // console.log("item", item)
         const isFollowed = () => {
           return item.user.userDetails.followers.some(
-            (item) => item._id.toString() === userId
+            (follower) => {
+              console.log("follower", follower);
+              return follower._id  ? follower._id.toString() === userId : follower.userId.toString();
+            }
           );
         };
 
@@ -243,8 +252,8 @@ const feedOneGET = async (req, res) => {
         return restWithoutFeed;
       });
 
-       // feed yorunlarını atanın takip edilme durumunu kontrol eder
-       restWithoutFeed.feed.comments.map((item) => {
+      // feed yorunlarını atanın takip edilme durumunu kontrol eder
+      restWithoutFeed.feed.comments.map((item) => {
         // console.log("item", item)
         const isFollowed = () => {
           return item.user.userDetails.followers.some(
@@ -263,8 +272,6 @@ const feedOneGET = async (req, res) => {
       restWithoutFeed.feed.comments = restWithoutFeed.feed.comments.reverse();
       return restWithoutFeed;
     });
-
-    
 
     res.status(200).json(formattedFeeds);
   } catch (error) {
@@ -389,7 +396,7 @@ const feedDELETE = async (req, res) => {
       await feedModel.findByIdAndDelete(parentId);
     } else {
       const feed = await feedModel.findById(parentId);
-      feed.feed.commentsCount -= 1
+      feed.feed.commentsCount -= 1;
       feed.feed.comments = feed.feed.comments.filter(
         (item) => item._id.toString() !== commentId
       );

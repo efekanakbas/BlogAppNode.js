@@ -42,26 +42,7 @@ const followPOST = async (req, res) => {
     // User'in followersCount'unu bir arttırır
     user.userDetails.followersCount++;
 
-    // if(commentId) {
-    //   // Eğer eşleşen belgeler varsa, followed değerini günceller
-    //   const updateExpression = {};
-
-    //   // Dinamik olarak $push operatörü oluşturma
-    //   updateExpression.$pull = {};
-    //   updateExpression.$pull[`feed.comments.$[elem].user.userDetails.followings`] = { username: me.username };
-
-    //   // Dinamik olarak $inc operatörü oluşturma
-    //   updateExpression.$inc = {};
-    //   updateExpression.$inc[`feed.comments.$[elem].user.userDetails.followingsCount`] = 1;
-
-    //   const arrayFilters = [{ "elem._id": new ObjectId(commentId) }];
-
-    //   await feedModel.updateMany(
-    //     { "user.userId": new ObjectId(objectId) }, // Güncellenmesi gereken belirli kriterler
-    //     updateExpression,
-    //     { arrayFilters }
-    //   );
-    //  }
+    //*
 
     // Eğer eşleşen belgeler varsa, followed değerini günceller
     await feedModel.updateMany(
@@ -72,6 +53,33 @@ const followPOST = async (req, res) => {
         $inc: { "user.userDetails.followersCount": 1 }, // User'in followersCount'unu bir arttırır
       }
     );
+
+    
+      // Eğer eşleşen belgeler varsa, followed değerini günceller
+      const updateExpression = {};
+
+      // Dinamik olarak $push operatörü oluşturma
+      updateExpression.$push = {};
+      updateExpression.$push[
+        `feed.comments.$[elem].user.userDetails.followers`
+      ] = me;
+
+      // Dinamik olarak $inc operatörü oluşturma
+      updateExpression.$inc = {};
+      updateExpression.$inc[
+        `feed.comments.$[elem].user.userDetails.followersCount`
+      ] = 1;
+
+      const arrayFilters = [{ "elem.user.username": username  }];
+
+      await feedModel.updateMany(
+        { "user.userId": new ObjectId(user._id) }, // Güncellenmesi gereken belirli kriterler
+        updateExpression,
+        { arrayFilters }
+      );
+    
+
+    //*
 
     // User'i istenilen formata getirir
     const { __v, _id, ...rest } = user;
@@ -94,6 +102,7 @@ const followPOST = async (req, res) => {
 
     me.userDetails.followingsCount++;
 
+    //!
     // Eğer eşleşen belgeler varsa, followed değerini günceller
     await feedModel.updateMany(
       { "user.userId": objectId }, // Güncellenmesi gereken belirli kriterler
@@ -103,6 +112,33 @@ const followPOST = async (req, res) => {
         $inc: { "user.userDetails.followingsCount": 1 }, // User'in followingsCount'unu bir arttırır
       }
     );
+
+    
+      // Eğer eşleşen belgeler varsa, followed değerini günceller
+      const updateExpression2 = {};
+
+      // Dinamik olarak $push operatörü oluşturma
+      updateExpression2.$push = {};
+      updateExpression2.$push[
+        `feed.comments.$[elem].user.userDetails.followers`
+      ] = me;
+
+      // Dinamik olarak $inc operatörü oluşturma
+      updateExpression2.$inc = {};
+      updateExpression2.$inc[
+        `feed.comments.$[elem].user.userDetails.followersCount`
+      ] = 1;
+
+      const arrayFilters2 = [{ "elem.user.username": username  }];
+
+      await feedModel.updateMany(
+        { "user.userId": new ObjectId(userId) }, // Güncellenmesi gereken belirli kriterler
+        updateExpression2,
+        { arrayFilters: arrayFilters2 }
+      );
+   
+
+    //!
 
     // Değişiklikleri veritabanında güncelle
     await user.save();
@@ -163,6 +199,8 @@ const unFollowPOST = async (req, res) => {
     // User/followersCount'dan bir düşer
     user.userDetails.followersCount--;
 
+    //*
+
     // Eğer eşleşen belgeler varsa, followed değerini günceller
     await feedModel.updateMany(
       { "user.userId": new ObjectId(user._id) }, // Güncellenmesi gereken belirli kriterler
@@ -171,6 +209,33 @@ const unFollowPOST = async (req, res) => {
         $inc: { "user.userDetails.followersCount": -1 }, // User/followersCount'dan bir düşer
       }
     );
+
+  
+      // Eğer eşleşen belgeler varsa, followed değerini günceller
+      const updateExpression = {};
+
+      // Dinamik olarak $push operatörü oluşturma
+      updateExpression.$pull = {};
+      updateExpression.$pull[
+        `feed.comments.$[elem].user.userDetails.followers`
+      ] = { username: me.username };
+
+      // Dinamik olarak $inc operatörü oluşturma
+      updateExpression.$inc = {};
+      updateExpression.$inc[
+        `feed.comments.$[elem].user.userDetails.followersCount`
+      ] = -1;
+
+      const arrayFilters = [{ "elem.user.username": username  }];
+
+      await feedModel.updateMany(
+        { "user.userId": new ObjectId(user._id) }, // Güncellenmesi gereken belirli kriterler
+        updateExpression,
+        { arrayFilters }
+      );
+   
+
+    //*
 
     // Me/followings içinden unfollow edileni çıkarır
 
@@ -181,6 +246,8 @@ const unFollowPOST = async (req, res) => {
     // Me/followingCount'dan bir düşer
     me.userDetails.followingsCount--;
 
+    //!
+
     // Eğer eşleşen belgeler varsa, followed değerini günceller
     await feedModel.updateMany(
       { "user.userId": objectId }, // Güncellenmesi gereken belirli kriterler
@@ -189,6 +256,33 @@ const unFollowPOST = async (req, res) => {
         $inc: { "user.userDetails.followingsCount": -1 }, // User/followingsCount'dan bir düşer
       }
     );
+
+    
+      // Eğer eşleşen belgeler varsa, followed değerini günceller
+      const updateExpression2 = {};
+
+      // Dinamik olarak $push operatörü oluşturma
+      updateExpression2.$pull = {};
+      updateExpression2.$pull[
+        `feed.comments.$[elem].user.userDetails.followers`
+      ] = { username: me.username };
+
+      // Dinamik olarak $inc operatörü oluşturma
+      updateExpression2.$inc = {};
+      updateExpression2.$inc[
+        `feed.comments.$[elem].user.userDetails.followersCount`
+      ] = 1;
+
+      const arrayFilters2 = [{ "elem.user.username": username }];
+
+      await feedModel.updateMany(
+        { "user.userId": new ObjectId(userId) }, // Güncellenmesi gereken belirli kriterler
+        updateExpression2,
+        { arrayFilters: arrayFilters2 }
+      );
+  
+
+    //!
 
     // Değişiklikleri veritabanında güncelle
     await me.save();

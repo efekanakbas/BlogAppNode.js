@@ -10,13 +10,18 @@ const suggestionsGET = async (req, res) => {
   
     const me = await authModel.findById(userId , {"__v":0  })
       
-    const blockedUsernames = me.userDetails.blocked.map(blockedUser => blockedUser.username);
+    const blockedUsernames = me.userDetails.blocked.map(
+      (blockedUser) => blockedUser.username
+    );
+    const blockedUsernames2 = me.userDetails.blockedBy.map(
+      (blockedByUser) => blockedByUser.username
+    );
 
-    console.log("blocked", blockedUsernames)
+    const allBlockedUsernames = blockedUsernames.concat(blockedUsernames2);
 
     // userId'ye eşit olmayan belgeleri rastgele sıralayarak döndür
     const randoms = await authModel.aggregate([
-      { $match: { _id: { $ne: userIdObjectId }, "username": { $nin: blockedUsernames } } }, // Belirli kullanıcı dışındaki ve engellenmemiş belgeleri eşleştir
+      { $match: { _id: { $ne: userIdObjectId }, "username": { $nin: allBlockedUsernames } } }, // Belirli kullanıcı dışındaki ve engellenmemiş belgeleri eşleştir
       { $sample: { size: 6 } } // Rastgele 6 belge döndür
      ]);
 

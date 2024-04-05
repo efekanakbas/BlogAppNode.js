@@ -57,6 +57,15 @@ const authModel = new mongoose.Schema({
             ],
             default: []
         },
+        blockedBy: {
+            type: [
+                {
+                   type: Object,
+                   default: null
+                }
+            ],
+            default: []
+        },
         followings:{
             type: [
                 {
