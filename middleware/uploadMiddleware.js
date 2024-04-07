@@ -2,6 +2,7 @@ const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
 const cloudinary = require('cloudinary').v2;
 const streamifier = require('streamifier');
+const path = require('path');
 
 // Cloudinary configurations
 cloudinary.config({
@@ -17,12 +18,12 @@ cloud_name: "djgg4wjct",
 const upload = multer({
  storage: multer.memoryStorage(), // Holds files at memory
  fileFilter: function (req, file, callback) {
-    const allowedMimes = ["image/png", "image/jpg", "image/jpeg"];
+    const allowedMimes = ["image/png", "image/jpg", "image/jpeg", "application/pdf"];
 
     if (allowedMimes.includes(file.mimetype)) {
       callback(null, true);
     } else {
-      console.log("Only jpg, png, jpeg files are supported");
+      console.log("Only jpg, png, jpeg and pdf files are supported");
       callback(null, false);
     }
  },
@@ -48,11 +49,18 @@ const uploadMiddleware = async (req, res, next) => {
      const urls = [];
      if (req.files) {
       for (const file of req.files) {
+        console.log("zAAAAAAAA", file.originalname)
         try {
+           // Dosya adının uzantısını alır
+      const extension = path.extname(file.originalname);
+      // Dosya adını uzantıdan temizler
+      const fileNameWithoutExtension = path.basename(file.originalname, extension);
+
+      
           const result = await new Promise((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream({
               folder: "uploads",
-              public_id: `${file.fieldname}-${uuidv4()}`,
+              public_id: `${file.fieldname}-${uuidv4()}-${fileNameWithoutExtension}`,
             }, (error, result) => {
               if (error) reject(error);
               else resolve(result);
