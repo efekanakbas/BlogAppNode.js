@@ -1,5 +1,6 @@
 const authModel = require("../models/auth.js");
 const feedModel = require("../models/feed.js");
+const notifModel = require("../models/notifications.js");
 const { ObjectId } = require("mongodb");
 
 const followPOST = async (req, res) => {
@@ -8,12 +9,21 @@ const followPOST = async (req, res) => {
     const objectId = new ObjectId(userId);
     const { username } = req.body;
     const me = await authModel.findById(userId, { password: 0, __v: 0 });
+    const basicMe = await authModel.findById(userId, { password: 0, __v: 0, userDetails:0, isLogged: 0 });
     // _id alanını userId olarak yeniden adlandırır
     me.userId = me._id;
     delete me._id;
 
     // username ile eşleşen kullanıcıları bul
     const users = await authModel.find({ username: username });
+    const basicUsers = await authModel.find({ username: username }, { password: 0, __v: 0, userDetails:0, isLogged: 0 });
+
+
+    //takip edildiğinde notification oluşturur
+    await notifModel.create({
+      userFrom: basicMe,
+      userTo:basicUsers[0]
+    })
 
     // Eğer kullanıcı bulunamazsa, hata mesajı döndür
     if (users.length === 0) {

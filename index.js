@@ -10,6 +10,7 @@ const routerSuggestions = require("./routes/suggestions");
 const routerUser = require("./routes/user");
 const routerFollow = require("./routes/follow");
 const routerSearch = require("./routes/search");
+const routerNotifications = require("./routes/notifications");
 const http = require('http')
 const { setupSocketIO } = require('./controllers/message.js');
 require("dotenv").config();
@@ -43,6 +44,7 @@ app.use("/", routerSuggestions)
 app.use("/", routerUser)
 app.use("/", routerFollow)
 app.use("/", routerSearch)
+app.use("/", routerNotifications)
 
 
 app.get("/", (req, res) => {
