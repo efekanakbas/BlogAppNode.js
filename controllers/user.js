@@ -1,5 +1,6 @@
 const authModel = require("../models/auth.js");
 const feedModel = require("../models/feed.js");
+const messageModel = require("../models/message.js");
 const { ObjectId } = require("mongodb");
 
 const detailsGET = async (req, res) => {
@@ -310,6 +311,20 @@ const avatarPATCH = async (req, res) => {
       { 'user.userId': objectId }, 
       { 'user.avatar': images[0] } 
    );
+
+    await messageModel.updateMany(
+      { 'user.userId': objectId }, 
+      { 'user.avatar': images[0] } 
+    )
+
+    const messages = await messageModel.find();
+
+    for (const message of messages) {
+      if (message.message.receiver.userId === userId) {
+        message.message.receiver.avatar = images[0];
+        await message.save();
+      }
+    }
 
     // Check if the user was found and updated
     if (!updatedUser) {

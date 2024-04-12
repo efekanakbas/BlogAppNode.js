@@ -67,6 +67,10 @@ const messageGET = async (req, res) => {
        };
      });
 
+     const messages = await messageModel.find()
+
+   console.log("messages:", messages[0].message.receiver)
+
  
      res.status(200).json(formattedMessages);
   } catch (error) {
